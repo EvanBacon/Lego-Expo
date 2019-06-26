@@ -1,5 +1,4 @@
 <h1 align="center">Welcome to Lego Expo 👋</h1>
-<img alt="Product: demo" src="promo/demo.png" />
 
 <p>
   <a href="https://github.com/EvanBacon/Lego-Expo/blob/master/LICENSE">
@@ -12,6 +11,8 @@
     <img alt="Github: evanbacon" src="https://img.shields.io/github/followers/evanbacon.svg?label=Stalk%20Me&style=social" target="_blank" />
   </a>
 </p>
+
+<img alt="Product: demo" src="promo/demo.png" />
 
 > Play with Lego bricks anywhere with Expo!
 
