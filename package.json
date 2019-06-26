@@ -8,8 +8,10 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "build": "expo build:web",
     "eject": "expo eject",
     "test": "jest --watchAll",
+    "update-webpack-config": "cp -r ../../expo-cli/packages/webpack-config/ node_modules/\\@expo/webpack-config/",
     "deploy": "netlify deploy --prod --dir web-build"
   },
   "jest": {

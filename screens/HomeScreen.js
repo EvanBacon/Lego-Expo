@@ -1,14 +1,17 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { getNode, useDimensions } from 'react-native-web-hooks';
-import 'three/examples/js/loaders/LDrawLoader';
 import 'three/examples/js/controls/OrbitControls';
+import 'three/examples/js/loaders/LDrawLoader';
+
+import * as DocumentPicker from 'expo-document-picker';
+import React from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { getNode, useDimensions } from 'react-native-web-hooks';
 
 let camera, scene, renderer, controls, model, textureCube;
 let envMapActivated = false;
 
 const ldrawPath = '../assets/ldraw/officialLibrary/';
 
+const DEFAULT_MODEL = require('../assets/ldraw/officialLibrary/models/30051-1-X-wingFighter-Mini.mpd_Packed.mpd');
 const modelFileList = {
   Car: require('../assets/ldraw/officialLibrary/models/car.ldr_Packed.mpd'),
   'Lunar Vehicle': 'models/1621-1-LunarMPVVehicle.mpd_Packed.mpd',
@@ -49,12 +52,16 @@ function updateLineSegments({ model, conditionalLines, displayLines }) {
   });
 }
 
-export default function HomeScreen() {
+function HomeScreen({ navigation }) {
   const {
     window: { width, height, scale },
   } = useDimensions();
   const ref = React.useRef(null);
   const [isLoading, setLoading] = React.useState(false);
+  const [modelFile, pickModel] = React.useState({
+    uri: DEFAULT_MODEL,
+    name: 'X-Wing',
+  });
   const [progress, setProgress] = React.useState(0);
   const [errorMessage, setError] = React.useState(null);
   const [layout, setLayout] = React.useState({ width, height });
@@ -74,6 +81,7 @@ export default function HomeScreen() {
   }, [layout, scale]);
 
   React.useEffect(() => {
+    if (!ref || !ref.current) return;
     if (camera) return;
     const node = getNode(ref);
     camera = new THREE.PerspectiveCamera(
@@ -108,6 +116,11 @@ export default function HomeScreen() {
     if (model) {
       scene.remove(model);
     }
+    if (!modelFile) {
+      setProgress(0);
+      setLoading(false);
+      return;
+    }
     model = null;
     setProgress(0);
     setLoading(true);
@@ -116,7 +129,7 @@ export default function HomeScreen() {
     lDrawLoader.smoothNormals = guiData.smoothNormals;
 
     lDrawLoader.load(
-      guiData.modelFileName,
+      modelFile.uri,
       group2 => {
         if (model) {
           scene.remove(model);
@@ -176,6 +189,11 @@ export default function HomeScreen() {
     );
   }
 
+  React.useEffect(() => {
+    reloadObject(true);
+    navigation.setParams({ title: modelFile ? modelFile.name : 'Lego Brix' });
+  }, [modelFile]);
+
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
       <View
@@ -183,38 +201,91 @@ export default function HomeScreen() {
         ref={ref}
         onLayout={({ nativeEvent: { layout } }) => setLayout(layout)}
       />
-      {isLoading && (
-        <View
-          style={[
-            StyleSheet.absoluteFill,
-            {
-              justifyContent: 'center',
-              backgroundColor: 'rgba(255,255,255,0.5)',
-              alignItems: 'center',
-            },
-          ]}
-        >
-          <Text>Loading... {Math.round(progress * 100, 2)}%</Text>
-        </View>
-      )}
-      {errorMessage && (
-        <View
-          style={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            justifyContent: 'center',
-            backgroundColor: 'rgba(255,255,255,0.5)',
-            alignItems: 'center',
-          }}
-        >
-          <Text style={{ padding: 16 }}>Error: {errorMessage}</Text>
-        </View>
-      )}
+
+      <PickerButton
+        style={{ position: 'absolute', top: 8, left: 8 }}
+        onPick={({ uri, name, size }) => {
+          pickModel({ uri, name });
+        }}
+      />
+
+      {isLoading && <LoadingView progress={progress} />}
+      {errorMessage && <ErrorView />}
     </View>
   );
 }
+
+function PickerButton({ onPick, style }) {
+  return (
+    <TouchableOpacity
+      style={style}
+      onPress={async () => {
+        const { type, uri, name, size } = await DocumentPicker.getDocumentAsync(
+          {},
+        );
+        if (type === 'success') {
+          onPick && onPick({ uri, name, size });
+        }
+      }}
+    >
+      <View
+        style={{
+          paddingHorizontal: 16,
+          paddingVertical: 8,
+          borderRadius: 8,
+          backgroundColor: 'rgba(255,255,255,0.5)',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Text style={{ fontWeight: 'bold', textAlign: 'center' }}>
+          Pick a model
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+}
+
+function ErrorView({ message }) {
+  return (
+    <View
+      style={{
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        justifyContent: 'center',
+        backgroundColor: 'rgba(255,255,255,0.5)',
+        alignItems: 'center',
+      }}
+    >
+      <Text style={{ padding: 16 }}>Error: {errorMessage}</Text>
+    </View>
+  );
+}
+
+function LoadingView({ progress }) {
+  return (
+    <View
+      style={[
+        StyleSheet.absoluteFill,
+        {
+          justifyContent: 'center',
+          backgroundColor: 'rgba(255,255,255,0.5)',
+          alignItems: 'center',
+        },
+      ]}
+    >
+      <Text>Loading... {Math.round(progress * 100, 2)}%</Text>
+    </View>
+  );
+}
+
+HomeScreen.navigationOptions = ({ navigation }) => ({
+  title: navigation.getParam('title'),
+});
+
+export default HomeScreen;
 
 const styles = StyleSheet.create({
   container: {

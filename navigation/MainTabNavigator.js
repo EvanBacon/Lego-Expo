@@ -1,5 +1,5 @@
 import React from 'react';
-import { Platform, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
 import {
   createStackNavigator,
   createBottomTabNavigator,
@@ -14,7 +14,16 @@ const HomeStack = createStackNavigator(
   {
     Home: HomeScreen,
   },
-  { headerMode: 'screen' },
+  {
+    headerMode: 'screen',
+    defaultNavigationOptions: {
+      headerStyle: {
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderBottomColor: 'rgba(156, 156, 156, 0.56)',
+        boxShadow: undefined,
+      },
+    },
+  },
 );
 
 HomeStack.navigationOptions = {
@@ -59,8 +68,9 @@ SettingsStack.navigationOptions = {
   ),
 };
 
-export default createBottomTabNavigator({
-  HomeStack,
-  LinksStack,
-  SettingsStack,
-});
+export default HomeStack;
+// export default createBottomTabNavigator({
+//   HomeStack,
+//   LinksStack,
+//   SettingsStack,
+// });

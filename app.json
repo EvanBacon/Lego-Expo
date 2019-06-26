@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "ldraw-demo",
-    "slug": "ldraw",
+    "name": "Lego Brix",
+    "slug": "lego",
     "privacy": "public",
     "sdkVersion": "33.0.0",
     "platforms": ["ios", "android", "web"],
