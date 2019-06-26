@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Lego Brix",
+    "name": "Lego Brix 🥓",
     "slug": "lego",
     "privacy": "public",
     "sdkVersion": "33.0.0",
@@ -8,8 +8,9 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
+    "primaryColor": "#ffffff",
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/images/icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -20,6 +21,9 @@
     "ios": {
       "supportsTablet": true
     },
-    "web": { "build": { "deepScopeAnalysis": false, "report": false } }
+    "web": {
+      "shortName": "Lego 🥓",
+      "build": { "deepScopeAnalysis": false, "report": false }
+    }
   }
 }
