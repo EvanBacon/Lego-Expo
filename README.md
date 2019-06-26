@@ -1,4 +1,6 @@
 <h1 align="center">Welcome to Lego Expo 👋</h1>
+<img alt="Product: demo" src="promo/demo.png" />
+
 <p>
   <a href="https://github.com/EvanBacon/Lego-Expo/blob/master/LICENSE">
     <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" target="_blank" />
@@ -6,13 +8,16 @@
   <a href="https://twitter.com/baconbrix">
     <img alt="Twitter: baconbrix" src="https://img.shields.io/twitter/follow/baconbrix.svg?style=social" target="_blank" />
   </a>
+  <a href="https://github.com/evanbacon" aria-label="follow @baconbrix">
+    <img alt="Github: evanbacon" src="https://img.shields.io/github/followers/evanbacon.svg?label=Stalk%20Me&style=social" target="_blank" />
+  </a>
 </p>
 
 > Play with Lego bricks anywhere with Expo!
 
-### 🏠 [Homepage](https://ldr.netlify.com)
+### 🏠 [**Try it now!**](https://ldr.netlify.com)
 
-## Install
+## Setup
 
 ```sh
 npm install
@@ -21,21 +26,15 @@ npm install
 ## Usage
 
 ```sh
-expo start
-```
-
-## Run tests
-
-```sh
-npm run test
+expo start --web
 ```
 
 ## Author
 
 👤 **Evan Bacon**
 
-* Twitter: [@baconbrix](https://twitter.com/baconbrix)
-* Github: [@EvanBacon](https://github.com/EvanBacon)
+- Twitter: [@baconbrix](https://twitter.com/baconbrix)
+- Github: [@EvanBacon](https://github.com/EvanBacon)
 
 ## 🤝 Contributing
 
@@ -50,5 +49,6 @@ Give a ⭐️ if this project helped you!
 Copyright © 2019 [Evan Bacon](https://github.com/EvanBacon).<br />
 This project is [MIT](https://github.com/EvanBacon/Lego-Expo/blob/master/LICENSE) licensed.
 
-***
+---
+
 _This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
