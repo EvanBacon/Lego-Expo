@@ -1,5 +1,17 @@
 {
+  "name": "Lego Expo",
+  "description": "Play with Lego brix anywhere using Expo",
   "main": "node_modules/expo/AppEntry.js",
+  "author": "Evan Bacon",
+  "license": "MIT",
+  "homepage": "https://github.com/evanbacon/Lego-Expo#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/evanbacon/Lego-Expo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/evanbacon/Lego-Expo/issues"
+  },
   "sideEffects": [
     "screens/HomeScreen.js"
   ],
