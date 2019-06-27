@@ -58,6 +58,7 @@ function HomeScreen({ navigation }) {
   } = useDimensions();
   const ref = React.useRef(null);
   const [isLoading, setLoading] = React.useState(false);
+  const [currentStep, setStep] = React.useState(-1);
   const [modelFile, pickModel] = React.useState({
     uri: DEFAULT_MODEL,
     name: 'X-Wing',
@@ -125,7 +126,7 @@ function HomeScreen({ navigation }) {
     setProgress(0);
     setLoading(true);
     const lDrawLoader = new THREE.LDrawLoader();
-    lDrawLoader.separateObjects = guiData.separateObjects;
+    lDrawLoader.separateObjects = true;
     lDrawLoader.smoothNormals = guiData.smoothNormals;
 
     lDrawLoader.load(
@@ -135,9 +136,20 @@ function HomeScreen({ navigation }) {
           scene.remove(model);
         }
         model = group2;
+        console.log(model);
         // Convert from LDraw coordinates: rotate 180 degrees around OX
         model.rotation.x = Math.PI;
         scene.add(model);
+
+        // const children = [...model.children[0].children];
+        // for (const child of children) {
+        //   // const object = new THREE.Mesh(
+        //   //   child,
+        //   //   new THREE.MeshBasicMaterial(0xff0000),
+        //   // );
+        //   model.children[0].add(new THREE.BoxHelper(child, 0xffff00));
+        // }
+
         // Adjust materials
         const { materials } = lDrawLoader;
         if (envMapActivated) {
@@ -190,9 +202,22 @@ function HomeScreen({ navigation }) {
   }
 
   React.useEffect(() => {
+    setStep(-1);
     reloadObject(true);
     navigation.setParams({ title: modelFile ? modelFile.name : 'Lego Brix' });
   }, [modelFile]);
+
+  React.useEffect(() => {
+    if (!model) return;
+
+    const children = [...model.children[0].children];
+
+    for (let i = 0; i < children.length; i++) {
+      const child = children[i];
+      child.visible = i <= currentStep;
+      console.log('parse child', child);
+    }
+  }, [currentStep]);
 
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
@@ -202,6 +227,24 @@ function HomeScreen({ navigation }) {
         onLayout={({ nativeEvent: { layout } }) => setLayout(layout)}
       />
 
+      {model && (
+        <NextButton
+          style={{ position: 'absolute', bottom: 8, left: 8 }}
+          onPress={() => setStep(Math.max(currentStep - 1, 0))}
+        >
+          Prev
+        </NextButton>
+      )}
+      {model && (
+        <NextButton
+          style={{ position: 'absolute', bottom: 8, right: 8 }}
+          onPress={() =>
+            setStep(
+              Math.min(currentStep + 1, model.children[0].children.length),
+            )
+          }
+        />
+      )}
       <PickerButton
         style={{ position: 'absolute', top: 8, left: 8 }}
         onPick={({ uri, name, size }) => {
@@ -215,6 +258,26 @@ function HomeScreen({ navigation }) {
   );
 }
 
+function NextButton({ onPress, style, children = 'Next' }) {
+  return (
+    <TouchableOpacity style={style} onPress={onPress}>
+      <View
+        style={{
+          paddingHorizontal: 16,
+          paddingVertical: 8,
+          borderRadius: 8,
+          backgroundColor: 'rgba(255,255,255,0.5)',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        <Text style={{ fontWeight: 'bold', textAlign: 'center' }}>
+          {children}
+        </Text>
+      </View>
+    </TouchableOpacity>
+  );
+}
 function PickerButton({ onPick, style }) {
   return (
     <TouchableOpacity
