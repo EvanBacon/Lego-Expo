@@ -1,7 +1,7 @@
 import React from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
 
-export default function LinksScreen() {
+export default function ModelsScreen() {
   return (
     <ScrollView style={styles.container}>
       {/**
@@ -12,7 +12,7 @@ export default function LinksScreen() {
   );
 }
 
-LinksScreen.navigationOptions = {
+ModelsScreen.navigationOptions = {
   title: 'Links',
 };
 

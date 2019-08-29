@@ -1,5 +1,5 @@
 {
-  "name": "Lego Expo",
+  "name": "lego-expo",
   "description": "Play with Lego brix anywhere using Expo",
   "main": "node_modules/expo/AppEntry.js",
   "author": "Evan Bacon",

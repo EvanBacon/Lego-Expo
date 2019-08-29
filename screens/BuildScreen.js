@@ -12,6 +12,7 @@ let envMapActivated = false;
 const ldrawPath = '../assets/ldraw/officialLibrary/';
 
 const DEFAULT_MODEL = require('../assets/ldraw/officialLibrary/models/30051-1-X-wingFighter-Mini.mpd_Packed.mpd');
+
 const modelFileList = {
   Car: require('../assets/ldraw/officialLibrary/models/car.ldr_Packed.mpd'),
   'Lunar Vehicle': 'models/1621-1-LunarMPVVehicle.mpd_Packed.mpd',
@@ -245,6 +246,9 @@ function HomeScreen({ navigation }) {
           }
         />
       )}
+
+      <LinkButton style={{ position: 'absolute', top: 8, right: 8 }} />
+
       <PickerButton
         style={{ position: 'absolute', top: 8, left: 8 }}
         onPick={({ uri, name, size }) => {
@@ -254,6 +258,32 @@ function HomeScreen({ navigation }) {
 
       {isLoading && <LoadingView progress={progress} />}
       {errorMessage && <ErrorView />}
+    </View>
+  );
+}
+
+function LinkButton({ onPress, style, children = 'Next' }) {
+  return (
+    <View
+      style={[
+        style,
+        {
+          paddingHorizontal: 16,
+          paddingVertical: 8,
+          borderRadius: 8,
+          backgroundColor: 'rgba(255,255,255,0.5)',
+          justifyContent: 'center',
+          alignItems: 'center',
+        },
+      ]}
+    >
+      <Text
+        accessibilityRole="link"
+        href="https://github.com/EvanBacon/Lego-Expo"
+        style={{ fontWeight: 'bold', textAlign: 'center' }}
+      >
+        Info on Github ⭐️
+      </Text>
     </View>
   );
 }
@@ -278,6 +308,7 @@ function NextButton({ onPress, style, children = 'Next' }) {
     </TouchableOpacity>
   );
 }
+
 function PickerButton({ onPick, style }) {
   return (
     <TouchableOpacity

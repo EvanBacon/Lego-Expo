@@ -6,13 +6,13 @@ import {
 } from 'react-navigation';
 
 import TabBarIcon from '../components/TabBarIcon';
-import HomeScreen from '../screens/HomeScreen';
-import LinksScreen from '../screens/LinksScreen';
+import BuildScreen from '../screens/BuildScreen';
+import ModelsScreen from '../screens/ModelsScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 
 const HomeStack = createStackNavigator(
   {
-    Home: HomeScreen,
+    Home: BuildScreen,
   },
   {
     headerMode: 'screen',
@@ -41,7 +41,7 @@ HomeStack.navigationOptions = {
 };
 
 const LinksStack = createStackNavigator({
-  Links: LinksScreen,
+  Links: ModelsScreen,
 });
 
 LinksStack.navigationOptions = {

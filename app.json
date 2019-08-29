@@ -23,7 +23,7 @@
     },
     "web": {
       "shortName": "Lego 🥓",
-      "build": { "deepScopeAnalysis": false, "report": false }
+      "build": { "deepScopeAnalysis": false }
     }
   }
 }
