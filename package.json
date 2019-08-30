@@ -24,7 +24,7 @@
     "eject": "expo eject",
     "test": "jest --watchAll",
     "update-webpack-config": "cp -r ../../expo-cli/packages/webpack-config/ node_modules/\\@expo/webpack-config/",
-    "deploy": "netlify deploy --prod --dir web-build"
+    "deploy": "netlify deploy --dir web-build"
   },
   "jest": {
     "preset": "jest-expo"

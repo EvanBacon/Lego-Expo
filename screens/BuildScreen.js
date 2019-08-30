@@ -394,9 +394,9 @@ function LoadingView({ progress }) {
   );
 }
 
-HomeScreen.navigationOptions = ({ navigation }) => ({
-  title: navigation.getParam('title'),
-});
+// HomeScreen.navigationOptions = ({ navigation }) => ({
+//   title: navigation.getParam('title'),
+// });
 
 export default HomeScreen;
 

@@ -10,6 +10,8 @@ import BuildScreen from '../screens/BuildScreen';
 import ModelsScreen from '../screens/ModelsScreen';
 import SettingsScreen from '../screens/SettingsScreen';
 
+import Colors from '../constants/Colors';
+
 const HomeStack = createStackNavigator(
   {
     Home: BuildScreen,
@@ -17,7 +19,16 @@ const HomeStack = createStackNavigator(
   {
     headerMode: 'screen',
     defaultNavigationOptions: {
+      title: 'RUBRICK',
+      headerTitleStyle: {
+        fontFamily: 'lego',
+        color: Colors.yellow,
+        fontSize: 33,
+        overflow: 'visible',
+      },
+
       headerStyle: {
+        backgroundColor: Colors.red,
         borderBottomWidth: StyleSheet.hairlineWidth,
         borderBottomColor: 'rgba(156, 156, 156, 0.56)',
         boxShadow: undefined,
