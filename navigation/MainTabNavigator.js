@@ -14,6 +14,7 @@ import Colors from '../constants/Colors';
 
 const HomeStack = createStackNavigator(
   {
+    // Select: ModelsScreen,
     Home: BuildScreen,
   },
   {

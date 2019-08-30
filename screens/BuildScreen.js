@@ -5,9 +5,11 @@ import * as DocumentPicker from 'expo-document-picker';
 import React from 'react';
 import {
   StyleSheet,
+  Picker,
   SafeAreaView,
   Text,
   TouchableOpacity,
+  Platform,
   View,
 } from 'react-native';
 import { getNode, useDimensions } from 'react-native-web-hooks';
@@ -21,24 +23,27 @@ let envMapActivated = false;
 const ldrawPath = '../assets/ldraw/officialLibrary/';
 
 const DEFAULT_MODEL = require('../assets/ldraw/officialLibrary/models/30051-1-X-wingFighter-Mini.mpd_Packed.mpd');
+// const DEFAULT_MODEL = require('../assets/ldraw/officialLibrary/models/4915-1-MiniConstruction.mpd_Packed.mpd');
+// const DEFAULT_MODEL = require('../assets/ldraw/officialLibrary/models/batwing.ldr');
+// const DEFAULT_MODEL = require('../assets/ldraw/officialLibrary/models/5935-1-IslandHopper.mpd_Packed.mpd');
 
 const modelFileList = {
   Car: require('../assets/ldraw/officialLibrary/models/car.ldr_Packed.mpd'),
-  'Lunar Vehicle': 'models/1621-1-LunarMPVVehicle.mpd_Packed.mpd',
-  'Radar Truck': 'models/889-1-RadarTruck.mpd_Packed.mpd',
-  Trailer: 'models/4838-1-MiniVehicles.mpd_Packed.mpd',
-  Bulldozer: 'models/4915-1-MiniConstruction.mpd_Packed.mpd',
-  Helicopter: 'models/4918-1-MiniFlyers.mpd_Packed.mpd',
-  Plane: 'models/5935-1-IslandHopper.mpd_Packed.mpd',
-  Lighthouse: 'models/30023-1-Lighthouse.ldr_Packed.mpd',
-  'X-Wing mini': 'models/30051-1-X-wingFighter-Mini.mpd_Packed.mpd',
-  'AT-ST mini': 'models/30054-1-AT-ST-Mini.mpd_Packed.mpd',
-  'AT-AT mini': 'models/4489-1-AT-AT-Mini.mpd_Packed.mpd',
-  Shuttle: 'models/4494-1-Imperial Shuttle-Mini.mpd_Packed.mpd',
-  'TIE Interceptor': 'models/6965-1-TIEIntercep_4h4MXk5.mpd_Packed.mpd',
-  'Star fighter': 'models/6966-1-JediStarfighter-Mini.mpd_Packed.mpd',
-  'X-Wing': 'models/7140-1-X-wingFighter.mpd_Packed.mpd',
-  'AT-ST': 'models/10174-1-ImperialAT-ST-UCS.mpd_Packed.mpd',
+  'Lunar Vehicle': require('../assets/ldraw/officialLibrary/models/1621-1-LunarMPVVehicle.mpd_Packed.mpd'),
+  'Radar Truck': require('../assets/ldraw/officialLibrary/models/889-1-RadarTruck.mpd_Packed.mpd'),
+  Trailer: require('../assets/ldraw/officialLibrary/models/4838-1-MiniVehicles.mpd_Packed.mpd'),
+  Bulldozer: require('../assets/ldraw/officialLibrary/models/4915-1-MiniConstruction.mpd_Packed.mpd'),
+  Helicopter: require('../assets/ldraw/officialLibrary/models/4918-1-MiniFlyers.mpd_Packed.mpd'),
+  Plane: require('../assets/ldraw/officialLibrary/models/5935-1-IslandHopper.mpd_Packed.mpd'),
+  Lighthouse: require('../assets/ldraw/officialLibrary/models/30023-1-Lighthouse.ldr_Packed.mpd'),
+  'X-Wing mini': require('../assets/ldraw/officialLibrary/models/30051-1-X-wingFighter-Mini.mpd_Packed.mpd'),
+  'AT-ST mini': require('../assets/ldraw/officialLibrary/models/30054-1-AT-ST-Mini.mpd_Packed.mpd'),
+  'AT-AT mini': require('../assets/ldraw/officialLibrary/models/4489-1-AT-AT-Mini.mpd_Packed.mpd'),
+  Shuttle: require('../assets/ldraw/officialLibrary/models/4494-1-Imperial Shuttle-Mini.mpd_Packed.mpd'),
+  'TIE Interceptor': require('../assets/ldraw/officialLibrary/models/6965-1-TIEIntercep_4h4MXk5.mpd_Packed.mpd'),
+  'Star fighter': require('../assets/ldraw/officialLibrary/models/6966-1-JediStarfighter-Mini.mpd_Packed.mpd'),
+  'X-Wing': require('../assets/ldraw/officialLibrary/models/7140-1-X-wingFighter.mpd_Packed.mpd'),
+  'AT-ST': require('../assets/ldraw/officialLibrary/models/10174-1-ImperialAT-ST-UCS.mpd_Packed.mpd'),
 };
 
 const guiData = {
@@ -62,6 +67,25 @@ function updateLineSegments({ model, conditionalLines, displayLines }) {
   });
 }
 
+function ModelPicker({ values, onSelect, style, ...props }) {
+  const [selected, setSelected] = React.useState(values[0]);
+  return (
+    <Picker
+      {...props}
+      selectedValue={selected}
+      style={[{}, style]}
+      onValueChange={(itemValue, itemIndex) => {
+        setSelected(itemValue);
+        onSelect(itemValue);
+      }}
+    >
+      {values.map((item, index) => (
+        <Picker.Item label={item} value={item} key={index} />
+      ))}
+    </Picker>
+  );
+}
+
 function HomeScreen({ navigation }) {
   const {
     window: { width, height, scale },
@@ -69,7 +93,7 @@ function HomeScreen({ navigation }) {
   const [isLoading, setLoading] = React.useState(false);
   const [currentStep, setStep] = React.useState(-1);
   const [modelFile, pickModel] = React.useState({
-    uri: DEFAULT_MODEL,
+    uri: (navigation && navigation.getParam('data')) || DEFAULT_MODEL,
     name: 'X-Wing',
   });
   const [progress, setProgress] = React.useState(0);
@@ -109,6 +133,7 @@ function HomeScreen({ navigation }) {
     const asset = Asset.fromModule(modelFile.uri);
     await asset.downloadAsync();
 
+    console.log('load: ', asset.localUri);
     lDrawLoader.load(
       asset.localUri,
       group2 => {
@@ -200,11 +225,16 @@ function HomeScreen({ navigation }) {
   }, [currentStep]);
 
   const handlers = useWindowTouches();
+  let ref = React.useRef(null);
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+    <View
+      style={{ flex: 1, backgroundColor: '#fff' }}
+      onLayout={({ nativeEvent: { layout } }) => setLayout(layout)}
+    >
       <GraphicsView
         {...handlers}
+        ref={ref}
         style={{ flex: 1 }}
         onCreate={props => {
           renderer = props.renderer;
@@ -224,22 +254,46 @@ function HomeScreen({ navigation }) {
           const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
           directionalLight.position.set(-1000, 1200, 1500);
           scene.add(directionalLight);
-          controls = new THREE.OrbitControls(camera);
+          if (Platform.OS === 'web') {
+            console.log(ref.current);
 
-          scene.add(new THREE.GridHelper(10, 10));
+            controls = new THREE.OrbitControls(camera, getNode(ref));
+          } else {
+            controls = new THREE.OrbitControls(camera);
+          }
           // load materials and then the model
           reloadObject(true);
         }}
         onUpdate={() => {
           if (renderer) renderer.render(scene, camera);
         }}
-        onLayout={({ nativeEvent: { layout } }) => setLayout(layout)}
       />
+
+      {Platform.OS === 'web' && (
+        <SafeAreaView
+          style={{
+            position: 'absolute',
+            top: Platform.select({ web: 12, default: 0 }),
+            right: 12,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+          }}
+        >
+          <ModelPicker
+            mode="dropdown"
+            values={Object.keys(modelFileList)}
+            onSelect={value => {
+              setLoading(true);
+              pickModel({ uri: modelFileList[value], name: value });
+            }}
+          />
+        </SafeAreaView>
+      )}
 
       <SafeAreaView
         style={{
           position: 'absolute',
-          bottom: 0,
+          bottom: Platform.select({ web: 12, default: 0 }),
           left: 12,
           right: 12,
           flexDirection: 'row',
@@ -262,7 +316,9 @@ function HomeScreen({ navigation }) {
         )}
       </SafeAreaView>
 
-      <LinkButton style={{ position: 'absolute', top: 8, right: 8 }} />
+      {false && (
+        <LinkButton style={{ position: 'absolute', top: 8, right: 8 }} />
+      )}
 
       <PickerButton
         style={{ position: 'absolute', top: 8, left: 8 }}
