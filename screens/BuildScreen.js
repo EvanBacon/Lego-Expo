@@ -3,25 +3,17 @@ import 'three/examples/js/loaders/LDrawLoader';
 
 import { Asset } from 'expo-asset';
 import React from 'react';
-import {
-  Picker,
-  Platform,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Platform, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { getNode, useDimensions } from 'react-native-web-hooks';
 
 import GraphicsView from '../components/GraphicsView';
 import NextStepButton from '../components/NextStepButton';
+import Picker from '../components/Picker';
 import PickModelDocumentButton from '../components/PickModelDocumentButton';
 import useWindowTouches from '../utils/useWindowTouches';
 
 let camera, scene, renderer, controls, model, textureCube;
 let envMapActivated = false;
-
-const ldrawPath = '../assets/ldraw/officialLibrary/';
 
 const DEFAULT_MODEL = require('../assets/ldraw/officialLibrary/models/30051-1-X-wingFighter-Mini.mpd_Packed.mpd');
 // const DEFAULT_MODEL = require('../assets/ldraw/officialLibrary/models/4915-1-MiniConstruction.mpd_Packed.mpd');
@@ -66,25 +58,6 @@ function updateLineSegments({ model, conditionalLines, displayLines }) {
       }
     }
   });
-}
-
-function ModelPicker({ values, onSelect, style, ...props }) {
-  const [selected, setSelected] = React.useState(values[0]);
-  return (
-    <Picker
-      {...props}
-      selectedValue={selected}
-      style={[{}, style]}
-      onValueChange={(itemValue, itemIndex) => {
-        setSelected(itemValue);
-        onSelect(itemValue);
-      }}
-    >
-      {values.map((item, index) => (
-        <Picker.Item label={item} value={item} key={index} />
-      ))}
-    </Picker>
-  );
 }
 
 function ModelView({
@@ -276,7 +249,7 @@ function ModelView({
   );
 }
 
-function HomeScreen({ navigation }) {
+function BuildScreen({ navigation }) {
   const {
     window: { width, height, scale },
   } = useDimensions();
@@ -314,7 +287,7 @@ function HomeScreen({ navigation }) {
             justifyContent: 'space-between',
           }}
         >
-          <ModelPicker
+          <Picker
             mode="dropdown"
             values={Object.keys(modelFileList)}
             onSelect={value => {
@@ -429,11 +402,11 @@ function LoadingView({ progress }) {
   );
 }
 
-// HomeScreen.navigationOptions = ({ navigation }) => ({
+// BuildScreen.navigationOptions = ({ navigation }) => ({
 //   title: navigation.getParam('title'),
 // });
 
-export default HomeScreen;
+export default BuildScreen;
 
 const styles = StyleSheet.create({
   container: {
