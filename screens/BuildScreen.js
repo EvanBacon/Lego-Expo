@@ -1,20 +1,21 @@
 import 'three/examples/js/controls/OrbitControls';
 import 'three/examples/js/loaders/LDrawLoader';
 
-import * as DocumentPicker from 'expo-document-picker';
+import { Asset } from 'expo-asset';
 import React from 'react';
 import {
-  StyleSheet,
   Picker,
-  SafeAreaView,
-  Text,
-  TouchableOpacity,
   Platform,
+  SafeAreaView,
+  StyleSheet,
+  Text,
   View,
 } from 'react-native';
 import { getNode, useDimensions } from 'react-native-web-hooks';
+
 import GraphicsView from '../components/GraphicsView';
-import { Asset } from 'expo-asset';
+import NextStepButton from '../components/NextStepButton';
+import PickModelDocumentButton from '../components/PickModelDocumentButton';
 import useWindowTouches from '../utils/useWindowTouches';
 
 let camera, scene, renderer, controls, model, textureCube;
@@ -86,24 +87,28 @@ function ModelPicker({ values, onSelect, style, ...props }) {
   );
 }
 
-function HomeScreen({ navigation }) {
+function ModelView({
+  setProgress,
+  setLoading,
+  setError,
+  currentStep,
+  modelFile,
+}) {
   const {
     window: { width, height, scale },
   } = useDimensions();
-  const [isLoading, setLoading] = React.useState(false);
-  const [currentStep, setStep] = React.useState(-1);
-  const [modelFile, pickModel] = React.useState({
-    uri: (navigation && navigation.getParam('data')) || DEFAULT_MODEL,
-    name: 'X-Wing',
-  });
-  const [progress, setProgress] = React.useState(0);
-  const [errorMessage, setError] = React.useState(null);
   const [layout, setLayout] = React.useState({ width, height });
 
+  let timer;
+
   function animate() {
-    requestAnimationFrame(animate);
+    timer = requestAnimationFrame(animate);
     renderer.render(scene, camera);
   }
+
+  React.useEffect(() => {
+    return () => clearTimeout(timer);
+  }, []);
 
   React.useEffect(() => {
     if (camera) {
@@ -207,7 +212,6 @@ function HomeScreen({ navigation }) {
   }
 
   React.useEffect(() => {
-    setStep(-1);
     reloadObject(true);
     // navigation.setParams({ title: modelFile ? modelFile.name : 'Lego Brix' });
   }, [modelFile]);
@@ -225,11 +229,11 @@ function HomeScreen({ navigation }) {
   }, [currentStep]);
 
   const handlers = useWindowTouches();
-  let ref = React.useRef(null);
+  const ref = React.useRef(null);
 
   return (
     <View
-      style={{ flex: 1, backgroundColor: '#fff' }}
+      style={{ flex: 1 }}
       onLayout={({ nativeEvent: { layout } }) => setLayout(layout)}
     >
       <GraphicsView
@@ -268,6 +272,37 @@ function HomeScreen({ navigation }) {
           if (renderer) renderer.render(scene, camera);
         }}
       />
+    </View>
+  );
+}
+
+function HomeScreen({ navigation }) {
+  const {
+    window: { width, height, scale },
+  } = useDimensions();
+  const [isLoading, setLoading] = React.useState(false);
+  const [currentStep, setStep] = React.useState(-1);
+  const [modelFile, pickModel] = React.useState({
+    uri: (navigation && navigation.getParam('data')) || DEFAULT_MODEL,
+    name: 'X-Wing',
+  });
+  const [progress, setProgress] = React.useState(0);
+  const [errorMessage, setError] = React.useState(null);
+
+  React.useEffect(() => {
+    setStep(-1);
+    // navigation.setParams({ title: modelFile ? modelFile.name : 'Lego Brix' });
+  }, [modelFile]);
+
+  return (
+    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+      <ModelView
+        setProgress={setProgress}
+        setLoading={setLoading}
+        setError={setError}
+        currentStep={currentStep}
+        modelFile={modelFile}
+      />
 
       {Platform.OS === 'web' && (
         <SafeAreaView
@@ -301,12 +336,12 @@ function HomeScreen({ navigation }) {
         }}
       >
         {model && (
-          <NextButton onPress={() => setStep(Math.max(currentStep - 1, 0))}>
+          <NextStepButton onPress={() => setStep(Math.max(currentStep - 1, 0))}>
             Prev
-          </NextButton>
+          </NextStepButton>
         )}
         {model && (
-          <NextButton
+          <NextStepButton
             onPress={() =>
               setStep(
                 Math.min(currentStep + 1, model.children[0].children.length),
@@ -320,7 +355,7 @@ function HomeScreen({ navigation }) {
         <LinkButton style={{ position: 'absolute', top: 8, right: 8 }} />
       )}
 
-      <PickerButton
+      <PickModelDocumentButton
         style={{ position: 'absolute', top: 8, left: 8 }}
         onPick={({ uri, name, size }) => {
           pickModel({ uri, name });
@@ -356,62 +391,6 @@ function LinkButton({ onPress, style, children = 'Next' }) {
         Info on Github ⭐️
       </Text>
     </View>
-  );
-}
-
-function NextButton({ onPress, style, children = 'Next' }) {
-  return (
-    <TouchableOpacity style={style} onPress={onPress}>
-      <View
-        style={{
-          paddingHorizontal: 16,
-          paddingVertical: 8,
-          borderRadius: 8,
-          backgroundColor: 'rgba(255,255,255,0.5)',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Text style={{ fontWeight: 'bold', textAlign: 'center' }}>
-          {children}
-        </Text>
-      </View>
-    </TouchableOpacity>
-  );
-}
-
-function PickerButton({ onPick, style }) {
-  return (
-    <TouchableOpacity
-      style={style}
-      onPress={async () => {
-        const { type, uri, name, size } = await DocumentPicker.getDocumentAsync(
-          {
-            type: `application/x-ldraw`,
-            //application/x-multipart-ldraw
-            //application/x-ldlite
-          },
-        );
-        if (type === 'success') {
-          onPick && onPick({ uri, name, size });
-        }
-      }}
-    >
-      <View
-        style={{
-          paddingHorizontal: 16,
-          paddingVertical: 8,
-          borderRadius: 8,
-          backgroundColor: 'rgba(255,255,255,0.5)',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
-        <Text style={{ fontWeight: 'bold', textAlign: 'center' }}>
-          Pick a model
-        </Text>
-      </View>
-    </TouchableOpacity>
   );
 }
 
