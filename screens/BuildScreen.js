@@ -3,8 +3,17 @@ import 'three/examples/js/loaders/LDrawLoader';
 
 import * as DocumentPicker from 'expo-document-picker';
 import React from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  StyleSheet,
+  SafeAreaView,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { getNode, useDimensions } from 'react-native-web-hooks';
+import GraphicsView from '../components/GraphicsView';
+import { Asset } from 'expo-asset';
+import useWindowTouches from '../utils/useWindowTouches';
 
 let camera, scene, renderer, controls, model, textureCube;
 let envMapActivated = false;
@@ -57,7 +66,6 @@ function HomeScreen({ navigation }) {
   const {
     window: { width, height, scale },
   } = useDimensions();
-  const ref = React.useRef(null);
   const [isLoading, setLoading] = React.useState(false);
   const [currentStep, setStep] = React.useState(-1);
   const [modelFile, pickModel] = React.useState({
@@ -82,39 +90,7 @@ function HomeScreen({ navigation }) {
     }
   }, [layout, scale]);
 
-  React.useEffect(() => {
-    if (!ref || !ref.current) return;
-    if (camera) return;
-    const node = getNode(ref);
-    camera = new THREE.PerspectiveCamera(
-      45,
-      layout.width / layout.height,
-      1,
-      10000,
-    );
-    camera.position.set(150, 200, 250);
-    // scene
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xdeebed);
-    const ambientLight = new THREE.AmbientLight(0xdeebed, 0.4);
-    scene.add(ambientLight);
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-    directionalLight.position.set(-1000, 1200, 1500);
-    scene.add(directionalLight);
-
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setPixelRatio(scale);
-    renderer.setSize(width, height);
-    node.appendChild(renderer.domElement);
-    controls = new THREE.OrbitControls(camera, renderer.domElement);
-
-    // load materials and then the model
-    reloadObject(true);
-
-    animate();
-  }, [ref && ref.current]);
-
-  function reloadObject(resetCamera) {
+  async function reloadObject(resetCamera) {
     if (model) {
       scene.remove(model);
     }
@@ -130,14 +106,17 @@ function HomeScreen({ navigation }) {
     lDrawLoader.separateObjects = true;
     lDrawLoader.smoothNormals = guiData.smoothNormals;
 
+    const asset = Asset.fromModule(modelFile.uri);
+    await asset.downloadAsync();
+
     lDrawLoader.load(
-      modelFile.uri,
+      asset.localUri,
       group2 => {
         if (model) {
           scene.remove(model);
         }
         model = group2;
-        console.log(model);
+        // console.log(model);
         // Convert from LDraw coordinates: rotate 180 degrees around OX
         model.rotation.x = Math.PI;
         scene.add(model);
@@ -205,7 +184,7 @@ function HomeScreen({ navigation }) {
   React.useEffect(() => {
     setStep(-1);
     reloadObject(true);
-    navigation.setParams({ title: modelFile ? modelFile.name : 'Lego Brix' });
+    // navigation.setParams({ title: modelFile ? modelFile.name : 'Lego Brix' });
   }, [modelFile]);
 
   React.useEffect(() => {
@@ -216,36 +195,72 @@ function HomeScreen({ navigation }) {
     for (let i = 0; i < children.length; i++) {
       const child = children[i];
       child.visible = i <= currentStep;
-      console.log('parse child', child);
+      // console.log('parse child', child);
     }
   }, [currentStep]);
 
+  const handlers = useWindowTouches();
+
   return (
     <View style={{ flex: 1, backgroundColor: '#fff' }}>
-      <View
+      <GraphicsView
+        {...handlers}
         style={{ flex: 1 }}
-        ref={ref}
+        onCreate={props => {
+          renderer = props.renderer;
+
+          camera = new THREE.PerspectiveCamera(
+            45,
+            props.width / props.height,
+            1,
+            10000,
+          );
+          camera.position.set(150, 200, 250);
+          // scene
+          scene = new THREE.Scene();
+          scene.background = new THREE.Color(0xdeebed);
+          const ambientLight = new THREE.AmbientLight(0xdeebed, 0.4);
+          scene.add(ambientLight);
+          const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+          directionalLight.position.set(-1000, 1200, 1500);
+          scene.add(directionalLight);
+          controls = new THREE.OrbitControls(camera);
+
+          scene.add(new THREE.GridHelper(10, 10));
+          // load materials and then the model
+          reloadObject(true);
+        }}
+        onUpdate={() => {
+          if (renderer) renderer.render(scene, camera);
+        }}
         onLayout={({ nativeEvent: { layout } }) => setLayout(layout)}
       />
 
-      {model && (
-        <NextButton
-          style={{ position: 'absolute', bottom: 8, left: 8 }}
-          onPress={() => setStep(Math.max(currentStep - 1, 0))}
-        >
-          Prev
-        </NextButton>
-      )}
-      {model && (
-        <NextButton
-          style={{ position: 'absolute', bottom: 8, right: 8 }}
-          onPress={() =>
-            setStep(
-              Math.min(currentStep + 1, model.children[0].children.length),
-            )
-          }
-        />
-      )}
+      <SafeAreaView
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 12,
+          right: 12,
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+        }}
+      >
+        {model && (
+          <NextButton onPress={() => setStep(Math.max(currentStep - 1, 0))}>
+            Prev
+          </NextButton>
+        )}
+        {model && (
+          <NextButton
+            onPress={() =>
+              setStep(
+                Math.min(currentStep + 1, model.children[0].children.length),
+              )
+            }
+          />
+        )}
+      </SafeAreaView>
 
       <LinkButton style={{ position: 'absolute', top: 8, right: 8 }} />
 
@@ -315,7 +330,11 @@ function PickerButton({ onPick, style }) {
       style={style}
       onPress={async () => {
         const { type, uri, name, size } = await DocumentPicker.getDocumentAsync(
-          {},
+          {
+            type: `application/x-ldraw`,
+            //application/x-multipart-ldraw
+            //application/x-ldlite
+          },
         );
         if (type === 'success') {
           onPick && onPick({ uri, name, size });
