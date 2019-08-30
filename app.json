@@ -1,18 +1,18 @@
 {
   "expo": {
-    "name": "Lego Brix 🥓",
+    "name": "Rubrick 🥓",
     "slug": "lego",
     "privacy": "public",
     "sdkVersion": "33.0.0",
     "platforms": ["ios", "android", "web"],
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "primaryColor": "#ffffff",
+    "icon": "./assets/icons/icon.png",
+    "primaryColor": "#E3000B",
     "splash": {
-      "image": "./assets/images/icon.png",
+      "image": "./assets/icons/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#E3000B"
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -26,7 +26,7 @@
       "usesIcloudStorage": true
     },
     "web": {
-      "shortName": "Lego 🥓",
+      "shortName": "Rubrick 🥓",
       "build": { "deepScopeAnalysis": false }
     }
   }
