@@ -1,15 +1,21 @@
 <h1 align="center">Welcome to Lego Expo 👋</h1>
 
 <p align="center">
-    <a href="https://twitter.com/baconbrix">
+      <a aria-label="made with expo" href="https://github.com/expo">
+     <img src="https://img.shields.io/badge/MADE%20WITH%20EXPO-4630EB.svg?style=for-the-badge" target="_blank" />
+  </a>
+ 
+ 
+   <a href="https://twitter.com/baconbrix">
     <img alt="Twitter: baconbrix" src="https://img.shields.io/twitter/follow/baconbrix.svg?style=for-the-badge" target="_blank" />
   </a>
+    
  
   <a href="https://github.com/EvanBacon/Lego-Expo/blob/master/LICENSE">
     <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge" target="_blank" />
   </a>
   <a href="https://github.com/evanbacon" aria-label="follow @baconbrix">
-    <img alt="Github: evanbacon" src="https://img.shields.io/github/followers/evanbacon.svg?label=Stalk%20Me&style=for-the-badge" target="_blank" />
+    <img alt="Github: evanbacon" src="https://img.shields.io/github/followers/evanbacon.svg?label=Follow%20on%20Github&style=for-the-badge" target="_blank" />
   </a>
 </p>
 
