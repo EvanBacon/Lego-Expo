@@ -1,13 +1,9 @@
 <h1 align="center">Welcome to Lego Expo 👋</h1>
 
 <p align="center">
-      <a aria-label="made with expo" href="https://github.com/expo">
-     <img src="https://img.shields.io/badge/MADE%20WITH%20EXPO-4630EB.svg?style=for-the-badge" target="_blank" />
-  </a>
-      
-<!--  <a aria-label="EXPO logo" href="https://github.com/expo">
+  <a aria-label="made with expo" href="https://github.com/expo">
     <img src="https://img.shields.io/badge/MADE%20WITH%20EXPO-4630EB.svg?style=for-the-badge&logo=EXPO&labelColor=FFFFFF&logoWidth=20">
-  </a> -->
+  </a>
   <a href="https://twitter.com/baconbrix">
     <img alt="Twitter: baconbrix" src="https://img.shields.io/twitter/follow/baconbrix.svg?style=for-the-badge&logo=TWITTER&logoColor=FFFFFF&labelColor=00aced&logoWidth=20&color=lightgray" target="_blank" />
   </a>
